@@ -6,6 +6,7 @@ import os
 import json
 import tkinter as tk
 import pygubu
+# this is added to fix issues when using Pyinstaller command
 from pygubu.builder import tkstdwidgets
 
 PRIMARY_COLOR = "#1492e6"
@@ -16,7 +17,7 @@ PROJECT_UI = os.path.join(PROJECT_PATH, "gui.ui")
 
 
 USER_HOME_DIR_PATH = os.path.expanduser("~")
-PROJECT_LOCAL_DIR_PATH = os.path.join(USER_HOME_DIR_PATH, ".passive_recorder")
+PROJECT_LOCAL_DIR_PATH = os.path.join(USER_HOME_DIR_PATH, ".backup_audio_recorder")
 PROJECT_CONF_PATH = os.path.join(PROJECT_LOCAL_DIR_PATH, "conf.json")
 PROJECT_DEFAULT_REC_OUTPUT_PATH = os.path.join(PROJECT_LOCAL_DIR_PATH, "recordings")
 
