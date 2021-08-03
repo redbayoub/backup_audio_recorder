@@ -69,4 +69,4 @@ the path to the file where the recording will be exported
 
 ## 📝 License
 
-This project is [LGPL-2.1](./MIT.md) licensed.
+This project is [LGPL-2.1](./LICENSE) licensed.
