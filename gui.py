@@ -1,6 +1,6 @@
 from constants import Constants
 import validators
-import passive_recorder
+from backup_audio_recorder import BackupAudioRecorder
 import dialogs
 import os
 import json
@@ -51,7 +51,7 @@ class GuiApp:
         self.__set_entry("minutes_dur_entry", self.conf_data["dur_minutes"])
         self.__set_entry("seconds_dur_entry", self.conf_data["dur_seconds"])
 
-        self.recorder = passive_recorder.PassiveRecorder(
+        self.recorder = BackupAudioRecorder(
             output_directory=self.conf_data["output_directory"],
             listening_finished_callback=self.listen,
             exporting_finished_callback=self.export,

@@ -3,7 +3,7 @@ import sys
 import os.path
 from threading import Event
 import time
-from passive_recorder import PassiveRecorder
+from backup_audio_recorder import BackupAudioRecorder
 
 parser = argparse.ArgumentParser(
     description="this script record your audio passively and later then you can get the last n seconds"
@@ -74,7 +74,7 @@ def exporting_finished_callback():
 stop_action_event = Event()
 stop_action_event.clear()
 
-recorder = PassiveRecorder(
+recorder = BackupAudioRecorder(
     output_directory=args.output_dir,
     listening_finished_callback=listening_finished_callback,
     exporting_finished_callback=exporting_finished_callback,

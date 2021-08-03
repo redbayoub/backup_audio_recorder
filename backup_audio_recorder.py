@@ -5,7 +5,7 @@ from threads.listening_thread import ListeningThread
 from threads.recording_thread import RecordingThread
 
 
-class PassiveRecorder:
+class BackupAudioRecorder:
 
     output_directory = None
     listening_finished_callback = None
