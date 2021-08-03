@@ -2,4 +2,6 @@ conf.json
 out/
 **/__pycache__
 .vscode/
-
+.venv/
+build/
+dist/
