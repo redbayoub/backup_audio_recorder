@@ -3,9 +3,11 @@
   <object class="tk.Toplevel" id="mainwindow">
     <property name="background">#f4f4f4</property>
     <property name="height">200</property>
+    <property name="iconbitmap">icon.ico</property>
     <property name="padx">10</property>
     <property name="pady">10</property>
     <property name="resizable">none</property>
+    <property name="title" translatable="yes">Backup Audio Recorder</property>
     <property name="width">200</property>
     <child>
       <object class="tk.Frame" id="frame1">

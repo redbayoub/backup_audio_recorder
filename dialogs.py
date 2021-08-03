@@ -1,5 +1,6 @@
 import platform
 import sys
+from utils import resource_path
 try:
     from tkinter import Tk
 except ImportError:
@@ -25,6 +26,7 @@ except ImportError:
 def ask_folder(initialdir):
     """ Ask the user to select a folder """
     root = Tk()
+    root.iconbitmap(resource_path('./icon.ico'))
     root.withdraw()
     root.wm_attributes('-topmost', 1)
     folder = askdirectory(parent=root,initialdir=initialdir)
@@ -36,6 +38,7 @@ def ask_folder(initialdir):
 def ask_file_save_location(file_type):
     """ Ask the user where to save a file """
     root = Tk()
+    root.iconbitmap(resource_path('./icon.ico'))
     root.withdraw()
     root.wm_attributes('-topmost', 1)
 
