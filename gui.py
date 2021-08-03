@@ -45,6 +45,12 @@ class GuiApp:
             json.dump(self.conf_data, open(PROJECT_CONF_PATH, "w"))
         else:
             self.conf_data = json.load(open(PROJECT_CONF_PATH))
+        
+        # if output directory doesn't exists set to default
+        if not os.path.isdir(self.conf_data["output_directory"]):
+            self.conf_data["output_directory"] = PROJECT_DEFAULT_REC_OUTPUT_PATH
+            json.dump(self.conf_data, open(PROJECT_CONF_PATH, "w"))
+
 
         self.__set_entry("location_entry", self.conf_data["output_directory"])
         self.__set_entry("days_dur_entry", self.conf_data["dur_days"])
