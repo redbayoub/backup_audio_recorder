@@ -1,6 +1,5 @@
 from constants import Constants
 from threading import Thread
-import time
 import os.path
 import json
 import sounddevice as sd

@@ -17,7 +17,6 @@ class BackupAudioRecorder:
     exporting_thread = None
 
     stop_recording_event = None
-    stop_saving_conf_event = None
     stop_listening_event = None
 
     is_recording = False
