@@ -40,7 +40,7 @@ class GuiApp:
                 "dur_days": 0,
                 "dur_hours": 0,
                 "dur_minutes": 0,
-                "dur_seconds": 0,
+                "dur_seconds": 10,
                 "startup_recording": False,
             }
             json.dump(self.conf_data, open(PROJECT_CONF_PATH, "w"))
