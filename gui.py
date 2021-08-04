@@ -41,6 +41,7 @@ class GuiApp:
                 "dur_hours": 0,
                 "dur_minutes": 0,
                 "dur_seconds": 0,
+                "startup_recording": False,
             }
             json.dump(self.conf_data, open(PROJECT_CONF_PATH, "w"))
         else:
@@ -57,12 +58,16 @@ class GuiApp:
         self.__set_entry("hours_dur_entry", self.conf_data["dur_hours"])
         self.__set_entry("minutes_dur_entry", self.conf_data["dur_minutes"])
         self.__set_entry("seconds_dur_entry", self.conf_data["dur_seconds"])
+        self.builder.get_variable("startup_recording_state").set(self.conf_data["startup_recording"])
 
         self.recorder = BackupAudioRecorder(
             output_directory=self.conf_data["output_directory"],
             listening_finished_callback=self.listen,
             exporting_finished_callback=self.export,
         )
+
+        if self.builder.get_variable("startup_recording_state").get():
+            self.record()
 
     def load_conf_data_from_output_dir(self, output_dir):
         rec_conf_path = os.path.join(output_dir, Constants.CONF_FILENAME)
@@ -123,23 +128,21 @@ class GuiApp:
 
             self.recorder.start_exporting(export_file_path)
             export_btn.config(text="Exporting ...")
+    
+    def startup_recording_callback(self):
+        self.__save_conf()
 
     def run(self):
         self.mainwindow.mainloop()
 
     def __save_conf(self):
-        location = self.builder.get_variable("location").get()
-        dur_seconds = self.builder.get_variable("dur_seconds").get()
-        dur_minutes = self.builder.get_variable("dur_minutes").get()
-        dur_hours = self.builder.get_variable("dur_hours").get()
-        dur_days = self.builder.get_variable("dur_days").get()
-        self.conf_data = {
-            "output_directory": location,
-            "dur_days": dur_days,
-            "dur_hours": dur_hours,
-            "dur_minutes": dur_minutes,
-            "dur_seconds": dur_seconds,
-        }
+        self.conf_data["output_directory"] =self.builder.get_variable("location").get()
+        self.conf_data["dur_seconds"] = self.builder.get_variable("dur_seconds").get()
+        self.conf_data["dur_minutes"] = self.builder.get_variable("dur_minutes").get()
+        self.conf_data["dur_hours"] = self.builder.get_variable("dur_hours").get()
+        self.conf_data["dur_days"] = self.builder.get_variable("dur_days").get()
+        self.conf_data["startup_recording"] = self.builder.get_variable("startup_recording_state").get()
+
         json.dump(self.conf_data, open(PROJECT_CONF_PATH, "w"))
 
     def __set_entry(self, entry_id, value):

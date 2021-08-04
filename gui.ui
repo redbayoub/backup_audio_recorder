@@ -216,6 +216,46 @@
       </object>
     </child>
     <child>
+      <object class="tk.Frame" id="frame2">
+        <property name="background">#f4f4f4</property>
+        <property name="height">50</property>
+        <property name="width">200</property>
+        <layout manager="pack">
+          <property name="fill">x</property>
+          <property name="pady">5</property>
+          <property name="propagate">True</property>
+          <property name="side">top</property>
+        </layout>
+        <child>
+          <object class="tk.Label" id="label7">
+            <property name="background">#f4f4f4</property>
+            <property name="justify">left</property>
+            <property name="text" translatable="yes">Other options</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="propagate">True</property>
+              <property name="row">0</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Checkbutton" id="startup_recording_checkbox">
+            <property name="background">#f4f4f4</property>
+            <property name="command" type="command" cbtype="simple">startup_recording_callback</property>
+            <property name="text" translatable="yes">Start recording on startup</property>
+            <property name="variable">boolean:startup_recording_state</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="propagate">True</property>
+              <property name="row">1</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
       <object class="tk.Frame" id="frame3">
         <property name="background">#f4f4f4</property>
         <property name="height">200</property>
@@ -250,7 +290,7 @@
           </object>
         </child>
         <child>
-          <object class="tk.Frame" id="frame2">
+          <object class="tk.Frame" id="frame4">
             <property name="height">200</property>
             <property name="highlightbackground">#1492e6</property>
             <property name="highlightthickness">1</property>
@@ -279,7 +319,7 @@
           </object>
         </child>
         <child>
-          <object class="tk.Frame" id="frame4">
+          <object class="tk.Frame" id="frame6">
             <property name="height">200</property>
             <property name="highlightbackground">#1492e6</property>
             <property name="highlightthickness">1</property>
