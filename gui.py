@@ -1,6 +1,7 @@
 from constants import Constants
 import validators
 from backup_audio_recorder import BackupAudioRecorder
+import sounddevice
 import dialogs
 import os
 import json
@@ -42,6 +43,8 @@ class GuiApp:
                 "dur_minutes": 0,
                 "dur_seconds": 10,
                 "startup_recording": False,
+                "input_device": None,
+                "output_device": None,
             }
             json.dump(self.conf_data, open(PROJECT_CONF_PATH, "w"))
         else:
@@ -60,14 +63,37 @@ class GuiApp:
         self.__set_entry("seconds_dur_entry", self.conf_data["dur_seconds"])
         self.builder.get_variable("startup_recording_state").set(self.conf_data["startup_recording"])
 
+        self.init_devices_menu()
+
         self.recorder = BackupAudioRecorder(
             output_directory=self.conf_data["output_directory"],
             listening_finished_callback=self.listen,
             exporting_finished_callback=self.export,
+            input_device=self.current_input_device,
+            output_device=self.current_output_device,
         )
+
 
         if self.builder.get_variable("startup_recording_state").get():
             self.record()
+
+    def init_devices_menu(self):
+        default_input_device=sounddevice.query_devices(kind='input')['name']
+        default_output_device=sounddevice.query_devices(kind='output')['name']
+        input_devices= [device['name'] for device in sounddevice.query_devices() if device['max_input_channels'] > 0]
+        output_devices= [device['name'] for device in sounddevice.query_devices() if device['max_output_channels'] > 0]
+        
+        self.current_input_device = self.conf_data["input_device"]
+        self.current_output_device = self.conf_data["output_device"]
+
+        self.builder.get_object('input_device_menu').config(values=[f'Default: {default_input_device}']+input_devices)
+        self.builder.get_object('input_device_menu').current(0 if not  self.current_input_device else input_devices.index(self.current_input_device)+1 )
+        self.builder.get_object('input_device_menu').bind('<<ComboboxSelected>>', self.on_input_device_selected)
+        
+        self.builder.get_object('output_device_menu').config(values=[f'Default: {default_output_device}']+output_devices)
+        self.builder.get_object('output_device_menu').current(0 if not  self.current_output_device else output_devices.index(self.current_output_device)+1)
+        self.builder.get_object('output_device_menu').bind('<<ComboboxSelected>>', self.on_output_device_selected)
+
 
     def load_conf_data_from_output_dir(self, output_dir):
         rec_conf_path = os.path.join(output_dir, Constants.CONF_FILENAME)
@@ -131,6 +157,31 @@ class GuiApp:
     
     def startup_recording_callback(self):
         self.__save_conf()
+    
+    def on_input_device_selected(self,event):
+        selected_input_device=self.builder.get_object('input_device_menu').get()
+        if selected_input_device == self.current_input_device:
+            return
+       
+        if selected_input_device.lower().startswith('default'):
+            self.current_input_device=None
+        else:
+            self.current_input_device=selected_input_device
+        self.recorder.set_input_device( self.current_input_device)
+        self.__save_conf()
+
+    def on_output_device_selected(self,event):
+        selected_output_device=self.builder.get_object('output_device_menu').get()
+        if selected_output_device == self.current_output_device:
+            return
+       
+        if selected_output_device.lower().startswith('default'):
+            self.current_output_device=None
+        else:
+            self.current_output_device=selected_output_device
+        self.recorder.set_output_device( self.current_output_device)
+        self.__save_conf()
+        pass
 
     def run(self):
         self.mainwindow.mainloop()
@@ -142,6 +193,8 @@ class GuiApp:
         self.conf_data["dur_hours"] = self.builder.get_variable("dur_hours").get()
         self.conf_data["dur_days"] = self.builder.get_variable("dur_days").get()
         self.conf_data["startup_recording"] = self.builder.get_variable("startup_recording_state").get()
+        self.conf_data["input_device"] = self.current_input_device
+        self.conf_data["output_device"] = self.current_output_device
 
         json.dump(self.conf_data, open(PROJECT_CONF_PATH, "w"))
 

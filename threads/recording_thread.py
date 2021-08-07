@@ -9,7 +9,7 @@ import soundfile as sf
 class RecordingThread(Thread):
 
     # kwargs = {
-    #   "output_directory","duration"
+    #   "output_directory","duration","input_device"
     #  }
     def __init__(
         self,
@@ -32,6 +32,7 @@ class RecordingThread(Thread):
         self.conf_data = None
         # i add one second to duration to mak sure that it shows on other programs exactly
         self.duration = self.kwargs["duration"] + 1
+        self.input_device = self.kwargs["input_device"]
         self.output_directory = None
         self.rec_pos = 0
         self.rec_out_path = None
@@ -88,6 +89,7 @@ class RecordingThread(Thread):
                     callback=in_callback,
                     samplerate=Constants.SAMPLE_RATE,
                     blocksize=Constants.BLOCKSIZE,
+                    device=self.input_device
                 ):
                     self.stop_event.wait()
                     # saving_conf_thread.join()

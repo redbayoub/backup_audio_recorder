@@ -1,4 +1,5 @@
 import os.path
+import sounddevice
 from threading import Event
 from threads.exporting_thread import ExportingThread
 from threads.listening_thread import ListeningThread
@@ -6,6 +7,9 @@ from threads.recording_thread import RecordingThread
 
 
 class BackupAudioRecorder:
+    input_device = None
+    output_device = None
+    audio_devices = None
 
     output_directory = None
     listening_finished_callback = None
@@ -24,7 +28,7 @@ class BackupAudioRecorder:
     is_exporting = False
 
     def __init__(
-        self, output_directory, listening_finished_callback, exporting_finished_callback
+        self, output_directory,input_device,output_device, listening_finished_callback, exporting_finished_callback
     ):
 
         self.listening_finished_callback = listening_finished_callback
@@ -32,6 +36,27 @@ class BackupAudioRecorder:
         if not os.path.isdir(output_directory):
             raise Exception("output directory not found")
         self.output_directory = output_directory
+
+        self.audio_devices= [ device['name'] for device in sounddevice.query_devices() ]
+        self.set_input_device(input_device)
+        self.set_output_device(output_device)
+        
+
+    def set_input_device(self, value):
+        if value is not None and  not value in self.audio_devices:
+            raise Exception("input device not found")
+        if value is None:
+            self.input_device = None
+        else:
+            self.input_device = self.audio_devices.index(value)
+    
+    def set_output_device(self, value):
+        if value is not None and not value in self.audio_devices:
+            raise Exception("output device not found")
+        if value is None:
+            self.output_device = None
+        else:
+            self.output_device = self.audio_devices.index(value)
 
     def set_output_directory(self, value):
         if not os.path.isdir(value):
@@ -44,7 +69,7 @@ class BackupAudioRecorder:
         self.stop_recording_event = Event()
         self.recording_thread = RecordingThread(
             stop_event=self.stop_recording_event,
-            kwargs={"duration": duration, "output_directory": self.output_directory},
+            kwargs={"duration": duration, "output_directory": self.output_directory, "input_device": self.input_device},
         )
         self.is_recording = True
         self.stop_recording_event.clear()
@@ -69,7 +94,7 @@ class BackupAudioRecorder:
         self.listening_thread = ListeningThread(
             stop_event=self.stop_listening_event,
             finished_callback=self.listening_finished_callback,
-            kwargs={"output_directory": self.output_directory},
+            kwargs={"output_directory": self.output_directory, "output_device": self.output_device},
         )
         self.stop_listening_event.clear()
         self.is_listening = True

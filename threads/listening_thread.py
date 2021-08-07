@@ -10,7 +10,7 @@ import soundfile as sf
 
 class ListeningThread(Thread):
     # kwargs = {
-    #   "output_directory"
+    #   "output_directory","output_device"
     #  }
     def __init__(
         self,
@@ -35,6 +35,7 @@ class ListeningThread(Thread):
         self.conf_data = None
 
         self.output_directory = None
+        self.output_device = self.kwargs["output_device"]
         self.rec_pos = 0
         self.duration = 0
         self.rec_out_path = None
@@ -117,6 +118,7 @@ class ListeningThread(Thread):
                 channels=f.channels,
                 callback=callback,
                 finished_callback=event.set,
+                device=self.output_device
             )
             with stream:
                 timeout = Constants.BLOCKSIZE * Constants.BUFFERSIZE / f.samplerate
