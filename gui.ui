@@ -104,7 +104,8 @@
             <property name="borderwidth">0</property>
             <property name="justify">center</property>
             <property name="state">normal</property>
-            <property name="textvariable">int:dur_days</property>
+            <property name="text" translatable="yes">0</property>
+            <property name="textvariable">string:dur_days</property>
             <property name="validate">key</property>
             <property name="validatecommand" type="command" cbtype="entry_validate" args="%P">is_int</property>
             <layout manager="grid">
@@ -133,7 +134,8 @@
             <property name="borderwidth">0</property>
             <property name="justify">center</property>
             <property name="state">normal</property>
-            <property name="textvariable">int:dur_hours</property>
+            <property name="text" translatable="yes">0</property>
+            <property name="textvariable">string:dur_hours</property>
             <property name="validate">key</property>
             <property name="validatecommand" type="command" cbtype="entry_validate" args="%P">is_int</property>
             <layout manager="grid">
@@ -162,7 +164,8 @@
             <property name="justify">center</property>
             <property name="relief">flat</property>
             <property name="state">normal</property>
-            <property name="textvariable">int:dur_minutes</property>
+            <property name="text" translatable="yes">0</property>
+            <property name="textvariable">string:dur_minutes</property>
             <property name="validate">key</property>
             <property name="validatecommand" type="command" cbtype="entry_validate" args="%P">is_int</property>
             <layout manager="grid">
@@ -190,7 +193,8 @@
             <property name="borderwidth">0</property>
             <property name="justify">center</property>
             <property name="state">normal</property>
-            <property name="textvariable">int:dur_seconds</property>
+            <property name="text" translatable="yes">0</property>
+            <property name="textvariable">string:dur_seconds</property>
             <property name="validate">key</property>
             <property name="validatecommand" type="command" cbtype="entry_validate" args="%P">is_int</property>
             <layout manager="grid">
@@ -210,6 +214,45 @@
               <property name="padx">10</property>
               <property name="propagate">True</property>
               <property name="row">1</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Frame" id="frame8">
+        <property name="background">#f4f4f4</property>
+        <property name="height">50</property>
+        <property name="width">200</property>
+        <layout manager="pack">
+          <property name="fill">x</property>
+          <property name="pady">5</property>
+          <property name="propagate">True</property>
+          <property name="side">top</property>
+        </layout>
+        <child>
+          <object class="tk.Label" id="label10">
+            <property name="background">#f4f4f4</property>
+            <property name="foreground">#969696</property>
+            <property name="text" translatable="yes">This will allocate from your local disk </property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="propagate">True</property>
+              <property name="row">0</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Label" id="estimated_filesize_label">
+            <property name="background">#f4f4f4</property>
+            <property name="font">TkDefaultFont</property>
+            <property name="justify">left</property>
+            <property name="text" translatable="yes">0 mb</property>
+            <property name="textvariable">string:estimated_filesize</property>
+            <layout manager="grid">
+              <property name="column">1</property>
+              <property name="propagate">True</property>
+              <property name="row">0</property>
             </layout>
           </object>
         </child>

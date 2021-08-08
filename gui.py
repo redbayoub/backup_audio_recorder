@@ -55,7 +55,13 @@ class GuiApp:
             self.conf_data["output_directory"] = PROJECT_DEFAULT_REC_OUTPUT_PATH
             json.dump(self.conf_data, open(PROJECT_CONF_PATH, "w"))
 
+        # setup duration entries callbacks
+        self.builder.get_variable("dur_days").trace_add("write", self.on_duration_change)
+        self.builder.get_variable("dur_hours").trace_add("write", self.on_duration_change)
+        self.builder.get_variable("dur_minutes").trace_add("write", self.on_duration_change)
+        self.builder.get_variable("dur_seconds").trace_add("write", self.on_duration_change)
 
+        #init entries
         self.__set_entry("location_entry", self.conf_data["output_directory"])
         self.__set_entry("days_dur_entry", self.conf_data["dur_days"])
         self.__set_entry("hours_dur_entry", self.conf_data["dur_hours"])
@@ -105,6 +111,10 @@ class GuiApp:
             # we substract one because it is added in recordding thread directly
             self.__set_entry("seconds_dur_entry", rec_conf_data["duration"]-1)
 
+    def on_duration_change(self,_,__,___):
+        duration = self.__get_duration()
+        filesize=BackupAudioRecorder.get_estimated_filesize(duration)
+        self.builder.get_variable("estimated_filesize").set(filesize)
 
 
     def browse(self):
@@ -188,10 +198,14 @@ class GuiApp:
 
     def __save_conf(self):
         self.conf_data["output_directory"] =self.builder.get_variable("location").get()
-        self.conf_data["dur_seconds"] = self.builder.get_variable("dur_seconds").get()
-        self.conf_data["dur_minutes"] = self.builder.get_variable("dur_minutes").get()
-        self.conf_data["dur_hours"] = self.builder.get_variable("dur_hours").get()
-        self.conf_data["dur_days"] = self.builder.get_variable("dur_days").get()
+
+        duration=self.get_duration_fields()
+
+        self.conf_data["dur_seconds"] = duration['dur_seconds']
+        self.conf_data["dur_minutes"] = duration['dur_minutes']
+        self.conf_data["dur_hours"] = duration['dur_hours']
+        self.conf_data["dur_days"] = duration['dur_days']
+
         self.conf_data["startup_recording"] = self.builder.get_variable("startup_recording_state").get()
         self.conf_data["input_device"] = self.current_input_device
         self.conf_data["output_device"] = self.current_output_device
@@ -204,25 +218,34 @@ class GuiApp:
         if not initial_entry_state == "normal":
             entry.configure(state="normal")
         entry.delete(0, tk.END)
-        entry.insert(0, value)
+        entry.insert(0, str(value))
         if not initial_entry_state == "normal":
             entry.configure(state=initial_entry_state)
+
+    def get_duration_fields(self):
+        dur_seconds = self.builder.get_variable("dur_seconds").get()
+        dur_minutes = self.builder.get_variable("dur_minutes").get()
+        dur_hours = self.builder.get_variable("dur_hours").get()
+        dur_days = self.builder.get_variable("dur_days").get()
+
+        dur_seconds = 0 if dur_seconds=="" else int(dur_seconds)
+        dur_minutes = 0 if dur_minutes=="" else int(dur_minutes)
+        dur_hours = 0 if dur_hours=="" else int(dur_hours)
+        dur_days = 0 if dur_days=="" else int(dur_days)
+        return {'dur_seconds':dur_seconds,'dur_minutes':dur_minutes,'dur_hours':dur_hours,'dur_days':dur_days, }
+
 
     def __get_duration(self):
         SECONDS_IN_MINUTE = 60
         SECONDS_IN_HOUR = SECONDS_IN_MINUTE * 60
         SECONDS_IN_DAY = SECONDS_IN_HOUR * 24
 
-        dur_seconds = self.builder.get_variable("dur_seconds").get()
-        dur_minutes = self.builder.get_variable("dur_minutes").get()
-        dur_hours = self.builder.get_variable("dur_hours").get()
-        dur_days = self.builder.get_variable("dur_days").get()
-
+        duration=self.get_duration_fields()
         return (
-            dur_seconds
-            + dur_minutes * SECONDS_IN_MINUTE
-            + dur_hours * SECONDS_IN_HOUR
-            + dur_days * SECONDS_IN_DAY
+            duration['dur_seconds']
+            + duration['dur_minutes'] * SECONDS_IN_MINUTE
+            + duration['dur_hours'] * SECONDS_IN_HOUR
+            + duration['dur_days'] * SECONDS_IN_DAY
         )
 
 

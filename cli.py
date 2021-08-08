@@ -155,6 +155,7 @@ recorder = BackupAudioRecorder(
 
 try:
     if args.action == "record":
+        print(f"This will allocate from your local disk: {BackupAudioRecorder.get_estimated_filesize(args.duration)}")
         recorder.start_recording(args.duration)
         print("recording started")
 

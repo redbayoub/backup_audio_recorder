@@ -126,3 +126,17 @@ class BackupAudioRecorder:
         self.is_exporting = False
         self.exporting_thread = None
         return True
+
+    @staticmethod
+    def get_estimated_filesize(duration):
+        total_KB_size= 254.5*duration
+        if total_KB_size<1000:
+            return f'{round(total_KB_size,2)} KB'
+        
+        total_MB_size= total_KB_size / 1024
+        if total_MB_size<1000:
+            return f'{round(total_MB_size,2)} MB'
+        
+        total_GB_size= total_MB_size / 1024
+        return f'{round(total_GB_size,2)} GB'
+
