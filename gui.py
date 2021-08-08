@@ -9,6 +9,7 @@ import tkinter as tk
 import pygubu
 # this is added to fix issues when using Pyinstaller command
 from pygubu.builder import tkstdwidgets
+from pygubu.builder import ttkstdwidgets
 
 PRIMARY_COLOR = "#1492e6"
 
