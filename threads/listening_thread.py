@@ -26,6 +26,7 @@ class ListeningThread(Thread):
             group=group,
             target=target,
             name=name,
+            daemon=True,
         )
         self.args = args
         self.kwargs = kwargs
