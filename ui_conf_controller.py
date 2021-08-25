@@ -15,6 +15,7 @@ class UiConfController:
         "dur_minutes": 0,
         "dur_seconds": 10,
         "startup_recording": False,
+        "startup_minimize": False,
         "input_device": None,
         "output_device": None,
     }

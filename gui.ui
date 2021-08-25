@@ -298,6 +298,21 @@
           </object>
         </child>
         <child>
+          <object class="tk.Checkbutton" id="startup_minimize_checkbox">
+            <property name="background">#f4f4f4</property>
+            <property name="command" type="command" cbtype="simple">startup_minimize_callback</property>
+            <property name="text" translatable="yes">Minimize on startup</property>
+            <property name="variable">boolean:startup_minimize_state</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">20</property>
+              <property name="propagate">True</property>
+              <property name="row">2</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
           <object class="tk.Label" id="label8">
             <property name="background">#f4f4f4</property>
             <property name="justify">left</property>
@@ -306,7 +321,7 @@
               <property name="column">0</property>
               <property name="padx">20</property>
               <property name="propagate">True</property>
-              <property name="row">2</property>
+              <property name="row">3</property>
               <property name="sticky">w</property>
             </layout>
           </object>
@@ -320,7 +335,7 @@
               <property name="column">0</property>
               <property name="padx">20</property>
               <property name="propagate">True</property>
-              <property name="row">4</property>
+              <property name="row">5</property>
               <property name="sticky">w</property>
             </layout>
           </object>
@@ -334,7 +349,7 @@
               <property name="column">0</property>
               <property name="padx">25</property>
               <property name="propagate">True</property>
-              <property name="row">5</property>
+              <property name="row">6</property>
               <property name="sticky">e</property>
             </layout>
           </object>
@@ -347,7 +362,7 @@
               <property name="column">0</property>
               <property name="padx">25</property>
               <property name="propagate">True</property>
-              <property name="row">3</property>
+              <property name="row">4</property>
             </layout>
           </object>
         </child>

@@ -59,6 +59,9 @@ class GuiApp:
         self.__set_entry("seconds_dur_entry", self.conf.get_conf("dur_seconds"))
         self.builder.get_variable("startup_recording_state").set(
             self.conf.get_conf("startup_recording")
+        )        
+        self.builder.get_variable("startup_minimize_state").set(
+            self.conf.get_conf("startup_minimize")
         )
 
         self.init_devices_menu()
@@ -71,6 +74,9 @@ class GuiApp:
             output_device=self.current_output_device,
         )
 
+        if self.builder.get_variable("startup_minimize_state").get():
+            self.mainwindow.iconify()
+        
         if self.builder.get_variable("startup_recording_state").get():
             self.record()
 
@@ -174,6 +180,12 @@ class GuiApp:
         self.conf.set_conf(
             "startup_recording",
             self.builder.get_variable("startup_recording_state").get(),
+        )
+    
+    def startup_minimize_callback(self):
+        self.conf.set_conf(
+            "startup_minimize",
+            self.builder.get_variable("startup_minimize_state").get(),
         )
 
     def on_input_device_selected(self, event):
