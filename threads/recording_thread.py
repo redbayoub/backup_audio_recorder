@@ -1,9 +1,11 @@
+from threads.file_utils import get_rec_pos
 from constants import Constants
 from threading import Thread
 import os.path
 import json
 import sounddevice as sd
 import soundfile as sf
+import numpy as np
 
 
 class RecordingThread(Thread):
@@ -44,26 +46,12 @@ class RecordingThread(Thread):
         if not os.path.isdir(self.output_directory):
             raise Exception("output directory not found")
 
-        self.conf_path = self.output_directory + os.path.sep + Constants.CONF_FILENAME
-        if not os.path.isfile(self.conf_path):
-            self.conf_data = {
-                "rec_pos": 0,
-                "duration": self.duration,
-            }
-            json.dump(self.conf_data, open(self.conf_path, "w"))
-        else:
-            self.conf_data = json.load(open(self.conf_path))
-
-        self.rec_pos = self.conf_data["rec_pos"]
-
-        # if the duration changed we save the new duration&
-        self.conf_data["duration"] = self.duration
-
         self.rec_out_path = (
             self.output_directory + os.path.sep + Constants.RECORDING_OUTPUT_FILENAME
         )
 
     def run(self):
+        rec_pos = get_rec_pos(self.rec_out_path)
         with sf.SoundFile(
             self.rec_out_path,
             mode="r+",
@@ -72,28 +60,26 @@ class RecordingThread(Thread):
             subtype=Constants.SUBTYPE,
         ) as outfile:
             try:
-                outfile.seek(self.rec_pos, sf.SEEK_SET)
+                outfile.seek(rec_pos, sf.SEEK_SET)
 
                 def in_callback(indata, frames, time, status):
+                    if not outfile.tell() == 0:
+                        outfile.seek(-Constants.BLOCKSIZE, sf.SEEK_CUR)
 
-                    outfile.write(indata)
+                    outfile.write(np.append(indata, Constants.REC_POS_SEP, axis=0))
 
                     if outfile.tell() >= self.duration * Constants.FILE_POS_PER_SECOND:
                         outfile.seek(0, sf.SEEK_SET)
-                    self.rec_pos = outfile.tell()
-
-                    self.conf_data["rec_pos"] = self.rec_pos
-                    json.dump(self.conf_data, open(self.conf_path, "w"))
 
                 with sd.InputStream(
                     channels=Constants.CHANNELS,
                     callback=in_callback,
                     samplerate=Constants.SAMPLE_RATE,
                     blocksize=Constants.BLOCKSIZE,
-                    device=self.input_device
+                    device=self.input_device,
+                    dtype=Constants.D_TYPE,
                 ):
                     self.stop_event.wait()
-                    # saving_conf_thread.join()
 
             finally:
                 outfile.close()

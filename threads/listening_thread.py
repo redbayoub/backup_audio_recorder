@@ -1,9 +1,9 @@
+from threads.file_utils import check_frames_is_rec_pos, get_rec_pos
 from constants import Constants
 from threading import Thread, Event
 from queue import Queue, Empty
 import time
 import os.path
-import json
 import sounddevice as sd
 import soundfile as sf
 
@@ -37,8 +37,6 @@ class ListeningThread(Thread):
 
         self.output_directory = None
         self.output_device = self.kwargs["output_device"]
-        self.rec_pos = 0
-        self.duration = 0
         self.rec_out_path = None
         self.__init_conf_data()
 
@@ -46,15 +44,6 @@ class ListeningThread(Thread):
         self.output_directory = self.kwargs["output_directory"]
         if not os.path.isdir(self.output_directory):
             raise Exception("output directory not found")
-
-        self.conf_path = self.output_directory + os.path.sep + Constants.CONF_FILENAME
-        if not os.path.isfile(self.conf_path):
-            raise Exception("conf file not found")
-
-        self.conf_data = json.load(open(self.conf_path))
-
-        self.rec_pos = self.conf_data["rec_pos"]
-        self.duration = self.conf_data["duration"]
 
         self.rec_out_path = (
             self.output_directory + os.path.sep + Constants.RECORDING_OUTPUT_FILENAME
@@ -89,54 +78,35 @@ class ListeningThread(Thread):
             channels=Constants.CHANNELS,
             subtype=Constants.SUBTYPE,
         ) as f:
-
-            file_is_looping = f.frames == self.duration * Constants.FILE_POS_PER_SECOND
-
-            if file_is_looping:
-                # file is looping
-                read_pos = self.rec_pos
-                f.seek(read_pos)
-            else:  # file is not looping
-                read_pos = 0
-
-            data = f.read(Constants.BLOCKSIZE)
-            q.put_nowait(data)
-            for i in range(1, Constants.BUFFERSIZE):
-                if file_is_looping and f.tell() == f.frames:
-                    f.seek(0)
-
-                if (file_is_looping and f.tell() == self.rec_pos) or (
-                    not file_is_looping and f.tell() == f.frames
-                ):
-                    data = []
-                    break
-
-                data = f.read(Constants.BLOCKSIZE)
-                q.put_nowait(data)  # Pre-fill queue
+            rec_pos = get_rec_pos(self.rec_out_path)
             stream = sd.OutputStream(
                 samplerate=f.samplerate,
                 blocksize=Constants.BLOCKSIZE,
                 channels=f.channels,
                 callback=callback,
                 finished_callback=event.set,
-                device=self.output_device
+                device=self.output_device,
+                dtype=Constants.D_TYPE,
             )
             with stream:
                 timeout = Constants.BLOCKSIZE * Constants.BUFFERSIZE / f.samplerate
-                while len(data) and not event.is_set() and not self.stop_event.is_set():
-
-                    if file_is_looping and f.tell() == f.frames:
+                f.seek(rec_pos)
+                initial = True
+                data = []
+                while initial or (
+                    len(data) and not event.is_set() and not self.stop_event.is_set()
+                ):
+                    if f.tell() == f.frames and not rec_pos == 0:
                         f.seek(0)
 
-                    if (file_is_looping and f.tell() == self.rec_pos) or (
-                        not file_is_looping and f.tell() == f.frames
-                    ):
-                        data = []
+                    if f.tell() == rec_pos and not initial:
                         break
 
                     data = f.read(Constants.BLOCKSIZE)
+                    if not check_frames_is_rec_pos(data):
+                        q.put(data, timeout=timeout)
+                    initial = False
 
-                    q.put(data, timeout=timeout)
                 # Wait until playback is finished
                 while not event.is_set() and not self.stop_event.is_set():
                     time.sleep(1)

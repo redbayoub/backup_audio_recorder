@@ -1,8 +1,7 @@
-from threads.file_utils import check_frames_is_rec_pos, get_rec_pos
 from constants import Constants
 from threading import Thread
 import os.path
-import json
+import sounddevice as sd
 import soundfile as sf
 
 
@@ -47,7 +46,6 @@ class ExportingThread(Thread):
         )
 
     def run(self):
-        read_pos = get_rec_pos(self.rec_out_path)
         with sf.SoundFile(
             self.export_file_path,
             mode="w",
@@ -61,20 +59,10 @@ class ExportingThread(Thread):
                 channels=Constants.CHANNELS,
                 subtype=Constants.SUBTYPE,
             ) as f:
-                f.seek(read_pos)
-                initial = True
-                data = []
-                while initial or len(data):
-                    if f.tell() == f.frames and not read_pos == 0:
-                        f.seek(0)
-
-                    if f.tell() == read_pos and not initial:
-                        break
-
+                data = f.read(Constants.BLOCKSIZE)
+                while len(data):
+                    export_f.write(data)
                     data = f.read(Constants.BLOCKSIZE)
-                    if not check_frames_is_rec_pos(data):
-                        export_f.write(data)
-                    initial = False
             export_f.close()
 
         self.exporting_finished_callback()
